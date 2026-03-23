@@ -15,7 +15,7 @@
 % interval on the best fit line.
 %% INSERT DATA HERE (PLEASE CHECK UNITS)
 x = [7.5 4 6 5 8]; % Voltage (V)
-y = [3.70 3.10 3.32 2.98 3.68]; % Depth (cm)
+y = [3.70 3.10 3.32 2.98 3.68]; % Depth (m)
 confLev = 0.95; % The confidence level
 N = length(y); % The number of data points
 xbar = mean(x);
@@ -51,7 +51,7 @@ plot(xplot,yplot)
 plot(xplot,yplot+lambdayhat,'-.b',xplot,yplot-lambdayhat,'-.b')
 plot(xplot,yplot+lambday,'--m',xplot,yplot-lambday,'--m')
 xlabel('Voltage (V)')
-ylabel('Depth (cm)')
+ylabel('Depth (m)')
 title('Depth vs Voltage Calibration Curve')
 if beta1 > 0
    location = 'northwest';
