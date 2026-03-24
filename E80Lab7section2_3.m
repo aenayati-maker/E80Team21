@@ -5,7 +5,7 @@
 clear; close all; clc;
 
 % Load Data
-filename = '_______';   % <-- CHANGE to our file name
+filename = '_______';   % <-- CHANGE TO OUR FILE NAME
 T = readtable(filename);
 
 % Extract acceleration columns MAKE SURE THESE ARE THE RIGHT COLLUMN NAMES
@@ -16,7 +16,7 @@ ay_mg = T.accelY;   % acceleration in Y (mg)
 dt = 0.099; % sample time (seconds) from E80 lab
 g = 9.81; % gravity (m/s^2)
 
-% Convert Units (mg → m/s^2)
+% Convert Units (mg -> m/s^2)
 ax = ax_mg * g / 1000;
 ay = ay_mg * g / 1000;
 
@@ -31,18 +31,18 @@ ay_bias = mean(ay(1:N_bias));
 ax = ax - ax_bias;
 ay = ay - ay_bias;
 
-% Integrate: Acceleration → Velocity
+% Integrate: Acceleration -> Velocity
 vx = cumtrapz(ax) * dt; %cumtrapz computes the approximate cumulative integral of Y via the trapezoidal method with unit spacing.
 vy = cumtrapz(ay) * dt;
 
-% Integrate: Velocity → Position
+% Integrate: Velocity -> Position
 x = cumtrapz(vx) * dt;
 y = cumtrapz(vy) * dt;
 
 % Time vector
 t = (0:length(x)-1) * dt;
 
-% Ideal Path (0 → 0.5 m → 0)
+% Ideal Path (0 -> 0.5 m -> 0)
 % Straight line forward and back
 x_ideal = [0 0.5 0];
 y_ideal = [0 0   0];
