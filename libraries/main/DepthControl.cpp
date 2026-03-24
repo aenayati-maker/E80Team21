@@ -27,10 +27,26 @@ void DepthControl::dive(z_state_t * state, int currentTime_in) {
   // You can access the desired depth from the wayPoints array at the index held in currentWayPoint
   // You can access the measured depth calculated in ZStateEstimator.cpp using state->z
   
-  //////////////////////////////////////////////////////////////////////
-  // write code here
-  //////////////////////////////////////////////////////////////////////
-  
+// Desired depth from current waypoint
+depth_des = wayPoints[currentWayPoint];
+
+// Current depth from pressure sensor
+depth = state->z;
+
+// Signed error (positive = too shallow so we need to go down, negative = too deep so we need to go up)
+depth_error = depth_des - depth;
+
+// Proportional control: motor effort proportional to error
+uV = Kp * depth_error;
+
+// Limit motor command to safe range
+if (uV > 200) {
+  uV = 200;
+}
+else if (uV < -200) {
+  uV = -200;
+}
+
   ///////////////////////////////////////////////////////////////////////
   // don't change code past this point
   ///////////////////////////////////////////////////////////////////////
