@@ -2,15 +2,12 @@
 % Section 2.3
 % IMU Position Estimation
 
-clear; close all; clc;
 
-% Load Data
-filename = '_______';   % <-- CHANGE TO OUR FILE NAME
-T = readtable(filename);
+
 
 % Extract acceleration columns MAKE SURE THESE ARE THE RIGHT COLLUMN NAMES
-ax_mg = T.accelX;   % acceleration in X (mg)
-ay_mg = T.accelY;   % acceleration in Y (mg)
+ax_mg = accelX;   % acceleration in X (mg)
+ay_mg = accelY;   % acceleration in Y (mg)
 
 % Constants
 dt = 0.099; % sample time (seconds) from E80 lab
@@ -50,7 +47,8 @@ y_ideal = [0 0   0];
 
 % Plot 1: X-Y Path
 figure;
-plot(x, y, 'b', 'LineWidth', 2); hold on;
+plot(x, y, 'b', 'LineWidth', 2);
+hold on;
 plot(x_ideal, y_ideal, 'r--', 'LineWidth', 2);
 
 xlabel('X Position (m)');
@@ -59,9 +57,19 @@ title('IMU Estimated Path vs Ideal Path');
 legend('Measured Path', 'Ideal Path');
 grid on;
 
+
+sigma_a = 0.02 * g;  % m/s^2
+confLev = 0.95; % The confidence level for bounds
+preie = sqrt(2)*erfinv(confLev)*sigma_a*sqrt(dt); % the prefix to the sqrt(t)
+preiie = 2/3*preie; % The prefix to t^3/2a = 1 + sin( pi*t - pi/2);
+plusie=preie*t.^0.5; % The positive noise bound for one integration
+plusiie = preiie*t.^1.5; % The positive noise bound for double integration
+
+rnp = y + plusiie'; % Position plus confidence bound
+rnm = y - plusiie'; % Position minus confidence bound
+
 % Uncertainty Calculation
 % We assume accelerometer noise (approx value)
-sigma_a = 0.02 * g;  % m/s^2
 
 % Uncertainty grows with double integration
 sigma_y = sigma_a * (t.^2) / 2;
@@ -69,8 +77,8 @@ sigma_y = sigma_a * (t.^2) / 2;
 % Plot 2: Y vs Time with Bounds
 figure;
 plot(t, y, 'b', 'LineWidth', 2); hold on;
-plot(t, y + sigma_y, 'r--');
-plot(t, y - sigma_y, 'r--');
+plot(t, rnp, 'r--');
+plot(t, rnm, 'r--');
 
 xlabel('Time (s)');
 ylabel('Y Position (m)');

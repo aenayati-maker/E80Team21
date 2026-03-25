@@ -14,8 +14,8 @@
 % the best fit line, and the upper and lower bounds for the confidence
 % interval on the best fit line.
 %% INSERT DATA HERE (PLEASE CHECK UNITS)
-x = [7.5 4 6 5 8]; % Voltage (V)
-y = [3.70 3.10 3.32 2.98 3.68]; % Depth (m)
+x = [1.29 1.34 1.4 1.45 1.5 1.57 1.62]; % Voltage (V)
+y = [0 0.05 0.1 0.15 0.2 0.25 0.3]; % Depth (m)
 confLev = 0.95; % The confidence level
 N = length(y); % The number of data points
 xbar = mean(x);

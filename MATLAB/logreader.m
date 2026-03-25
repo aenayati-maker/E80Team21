@@ -2,9 +2,9 @@
 % Use this script to read data from your micro SD card
 
 clear;
-%clf;
+clf;
 
-filenum = '004'; % file number for the data you want to read
+filenum = '042'; % file number for the data you want to read
 infofile = strcat('INF', filenum, '.TXT');
 datafile = strcat('LOG', filenum, '.BIN');
 
