@@ -29,10 +29,10 @@ void ADCSampler::updateSample(void)
 
 String ADCSampler::printSample(void)
 {
-  String printString = "ADC:";
+  String printString = "ADCS:";
   for (int i=0; i<NUM_PINS; i++) {
     printString += " ";
-    printString += String(sample[i]);
+    printString += String((sample[i]*3.3)/1024);
   }
   return printString;
 }
@@ -45,3 +45,4 @@ size_t ADCSampler::writeDataBytes(unsigned char * buffer, size_t idx)
   }
   return idx + NUM_PINS*sizeof(int);
 }
+
