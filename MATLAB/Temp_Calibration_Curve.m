@@ -10,7 +10,7 @@ VoutB = [0.002, 0.434, 1.67, 2.068, 2.46, 2.89, 2.88, 2.834];
 % Measured temperatures in C
 TC = [35.9, 22.2, 19.0, 16.3, 13.5, 12.1, 11.5, 9.8];
 
-% Convert to Kelvin because your old code uses TN in K
+% Convert to Kelvin because old code uses TN in K
 TN = TC + 273.15;
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -24,7 +24,7 @@ Rm = 10.03e3;   % ohms
 %  "40k" is two resistors in series
 Rf1 = 20e3;  % ohms
 Rf2 = 20.13e3;  % ohms
-Rf = Rf1 + Rf2; % true feedback resistance
+Rf = Rf1 + Rf2; % true resistance
 
 % Reference divider for VinB+
 R1 = 24.84e3;      % from +5V to VinB+ (remeasure this)
@@ -43,7 +43,6 @@ VinA = (Rm/Rf) .* (Vref*(1 + Rf/Rm) - VoutB);
 
 % Divider:
 % VinA = Vcc*R3/(RT + R3)
-% so
 % RT = R3*(Vcc/VinA - 1)
 
 R = R3 .* (Vcc./VinA - 1);
