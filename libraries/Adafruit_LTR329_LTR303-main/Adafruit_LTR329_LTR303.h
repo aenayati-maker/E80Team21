@@ -77,7 +77,7 @@ typedef enum {
 class Adafruit_LTR329 {
 public:
   Adafruit_LTR329();
-  bool begin(TwoWire *theWire = &Wire);
+  bool begin(TwoWire *theWire = &Wire1);
   bool reset(void);
 
   void enable(bool en);
