@@ -5,10 +5,10 @@ close all
 %%%%%%%%%%%%%%%%%%%%%
 %% PUT DATA IN HERE
 % Teensy voltage = output of second op amp
-VoutB = [0.002, 0.434, 1.67, 2.068, 2.46, 2.89, 2.88, 2.834];
+VoutB = [.068, .287, .42, 1.113, 2.068, 2.46, 2.89, 2.88, 2.834];
 
 % Measured temperatures in C
-TC = [35.9, 22.2, 19.0, 16.3, 13.5, 12.1, 11.5, 9.8];
+TC = [22.2, 21.7, 20.4, 17.7, 16.3, 13.5, 12.1, 11.5, 9.8];
 
 % Convert to Kelvin because your old code uses TN in K
 TN = TC + 273.15;
@@ -16,10 +16,10 @@ TN = TC + 273.15;
 %%%%%%%%%%%%%%%%%%%%%
 %%  RESISTOR VALUES (with true values from lab)
 % Thermistor divider fixed resistor ("47k one")
-R3 = 50.07e3;   % ohms
+R3 = 47.2e3;   % ohms
 
 % Second op amp resistors
-Rm = 10.03e3;   % ohms
+Rm = 9.9e3;   % ohms
 
 %  "40k" is two resistors in series
 Rf1 = 20e3;  % ohms
@@ -27,8 +27,8 @@ Rf2 = 20.13e3;  % ohms
 Rf = Rf1 + Rf2; % true feedback resistance
 
 % Reference divider for VinB+
-R1 = 24.84e3;      % from +5V to VinB+ (remeasure this)
-R2 = 17.53e3;   % from VinB+ to ground (remeasure this)
+R1 = 28.58e3;      % from +5V to VinB+ (remeasure this)
+R2 = 18.82e3;   % from VinB+ to ground (remeasure this)
 
 Vcc = 5.0;      % supply voltage
 
@@ -88,7 +88,11 @@ ft = fittype('1/(a+b*log(R)+c*(log(R)^2)+d*(log(R)^3))', ...
 [Xout,Yout] = prepareCurveData(R, TN);
 
 % Now we'll do our fit.
+
 [f4,stat4] = fit(Xout,Yout,ft)
+
+
+%use lsqcurvefit(fun,x0,xdata,ydata,lb,ub)
 
 p11 = predint(f4,xplot,confLev,'observation','off'); % Gen conf bounds
 p21 = predint(f4,xplot,confLev,'functional','off'); % Gen conf bounds
@@ -104,6 +108,10 @@ title('Steinhart-Hart Fit for Data Taken')
 legend('Data Points','Best Fit Line','Upper Func. Bound', ...
    'Lower Func. Bound', 'Upper Obs. Bound', 'Lower Obs. Bound', ...
    'Location', 'northeast')
+grid on;
+
+
+ylim([280 310]);
 hold off
 
 %% Nonlinear Residuals
@@ -114,13 +122,12 @@ ylabel('Residuals (K)')
 title('Steinhart-Hart Fit Residuals')
 
 %%%%%%%%%%%%%%%%%%%%%
-%% OPTIONAL: DIRECT CALIBRATION CURVE FOR TEENSY VOLTAGE -> TEMPERATURE
-% This gives you a direct curve for the Teensy output voltage.
-
 rangeV = max(VoutB) - min(VoutB);
 xplotV = min(VoutB):rangeV/100:max(VoutB);
 
-Tplot = f4(R3 .* (Vcc ./ ((Rm/Rf) .* (Vref*(1 + Rf/Rm) - xplotV)) - 1));
+VinAplot = (Rm/Rf) .* (Vref*(1 + Rf/Rm) - xplotV);
+Rplot = R3 .* (Vcc./VinAplot - 1);
+Tplot = f4(Rplot);
 
 figure(3)
 plot(VoutB,TN,'o')
