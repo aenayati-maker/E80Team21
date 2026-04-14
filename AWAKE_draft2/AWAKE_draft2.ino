@@ -165,7 +165,7 @@ void loop() {
         depth_control.dive(&z_state_estimator.state, currentTime);
       } else {
         depth_control.diveState = false;
-        depth_control.surfaceState = true;
+        depth_control.surfaceState = false; //changed to false
       }
 
       motor_driver.drive(depth_control.uV, depth_control.uV, depth_control.uV);
