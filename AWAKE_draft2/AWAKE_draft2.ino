@@ -98,7 +98,7 @@ void setup() {
   motor_driver.init();
   led.init();
 
-  int diveDelay = 3000;
+  int diveDelay = 10000;
 
   const int num_depth_waypoints = 2;
   double depth_waypoints[] = {0.5, 1};
@@ -168,7 +168,7 @@ void loop() {
         depth_control.surfaceState = true;
       }
 
-      motor_driver.drive(0, 0, depth_control.uV);
+      motor_driver.drive(depth_control.uV, depth_control.uV, depth_control.uV);
     }
 
     if (depth_control.surfaceState) {
@@ -179,7 +179,7 @@ void loop() {
         delete[] depth_control.wayPoints;
       }
 
-      motor_driver.drive(0, 0, depth_control.uV);
+      motor_driver.drive(depth_control.uV, depth_control.uV, depth_control.uV);
     }
   }
 
