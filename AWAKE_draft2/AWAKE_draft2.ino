@@ -55,6 +55,7 @@ volatile bool EF_States[NUM_FLAGS] = {1,1,1};
 ////////////////////////* SETUP *////////////////////////////////
 
 void setup() {
+  ltr_enabled = 1;
 
   logger.include(&imu);
   logger.include(&gps);
@@ -98,7 +99,7 @@ void setup() {
   motor_driver.init();
   led.init();
 
-  int diveDelay = 10000;
+  int diveDelay = 3000;
 
   const int num_depth_waypoints = 2;
   double depth_waypoints[] = {0.5, 1};
@@ -124,6 +125,8 @@ void setup() {
 //////////////////////////////* LOOP */////////////////////////
 
 void loop() {
+  lightValid = 1;
+
 
   currentTime = millis();
 
@@ -149,12 +152,16 @@ void loop() {
       printer.printValue(11, String(visible_plus_ir) + "," + String(infrared));
     } else {
       printer.printValue(11, "NO LIGHT DATA");
+      printer.printValue(12, ltr.newDataAvailable());
     }
 
     printer.printToSerial();
   }
 
   ////////////////////// CONTROL //////////////////////
+
+
+  if (currentTime > 60000) { 
   if (currentTime - depth_control.lastExecutionTime > LOOP_PERIOD) {
     depth_control.lastExecutionTime = currentTime;
 
@@ -181,6 +188,7 @@ void loop() {
 
       motor_driver.drive(depth_control.uV, depth_control.uV, depth_control.uV);
     }
+  }
   }
 
   ////////////////////// ADC //////////////////////
@@ -224,7 +232,10 @@ void loop() {
 
   ////////////////////// LIGHT SENSOR (SAFE) //////////////////////
   if (ltr_enabled && ltr.newDataAvailable()) {
-    lightValid = ltr.readBothChannels(visible_plus_ir, infrared);
+    lightValid = 1;
+    //lightValid = ltr.readBothChannels(visible_plus_ir, infrared);
+    ltr.readBothChannels(visible_plus_ir, infrared);
+
   } else {
     lightValid = false;
   }
