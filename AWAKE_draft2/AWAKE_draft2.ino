@@ -127,7 +127,6 @@ void setup() {
 void loop() {
   lightValid = 1;
 
-
   currentTime = millis();
 
   ////////////////////// PRINTER //////////////////////
