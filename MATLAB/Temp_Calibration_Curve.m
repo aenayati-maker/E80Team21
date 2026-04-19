@@ -139,3 +139,6 @@ title('Temperature vs Teensy Voltage Calibration Curve')
 legend('Data Points','Best Fit Curve','Location','northeast')
 grid on
 hold off
+
+
+plot(depth)

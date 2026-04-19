@@ -1,6 +1,9 @@
 
 % Run logreader.m first
-
+temp_voltage = cast(A01,"double") * 3.3 / 1024;
+pressure_voltage = cast(A00,"double") * 3.3 / 1024;
+visible_plus_ir = ch0;
+infrared = ch1;
 
 % check what comes out of log reader just in case 
 disp('Variables loaded:')
@@ -49,107 +52,52 @@ T_K = 1 ./ (a + b.*log(R) + c.*(log(R)).^2 + d.*(log(R)).^3);
 T_C = T_K - 273.15;
 
 
-%% PRESSURE CALIBRATION
-
-% We need to do this calibration curve on site so remember to do this first
-% for our data
-
-x = [ ]; % Voltage (V)
-y = [ ]; % Depth (m)
-
-
-confLev = 0.95;
-N = length(y);
-
-xbar = mean(x);
-ybar = mean(y);
-
-Sxx = dot((x-xbar),(x-xbar));
-
-% Best-fit slope
-beta1 = dot((x-xbar),(y-ybar))/Sxx
-
-% Best-fit intercept
-beta0 = ybar - beta1*xbar
-
-% Residuals
-yfit = beta0 + beta1*x;
-SSE = dot((y - yfit),(y - yfit))
-Se = sqrt(SSE/(N-2))
-
-% Errors
-Sbeta0 = Se*sqrt(1/N + xbar^2/Sxx)
-Sbeta1 = Se/sqrt(Sxx)
-
-StdT = tinv((1-0.5*(1-confLev)),N-2)
-
-lambdaBeta1 = StdT*Sbeta1
-lambdaBeta0 = StdT*Sbeta0
-
-% Plot calibration curve
-range = max(x) - min(x);
-xplot = min(x):range/30:max(x);
-yplot = beta0 + beta1*xplot;
-
-Syhat = Se*sqrt(1/N + (xplot - xbar).*(xplot - xbar)/Sxx);
-lambdayhat = StdT*Syhat;
-
-Sy = Se*sqrt(1+1/N + (xplot - xbar).*(xplot - xbar)/Sxx);
-lambday = StdT*Sy;
-
-figure;
-plot(x,y,'o')
-hold on
-plot(xplot,yplot,'-')
-plot(xplot,yplot+lambdayhat,'-.')
-plot(xplot,yplot-lambdayhat,'-.')
-plot(xplot,yplot+lambday,'--')
-plot(xplot,yplot-lambday,'--')
-xlabel('Voltage (V)')
-ylabel('Depth (m)')
-title('Depth vs Voltage Calibration Curve')
-
-if beta1 > 0
-   location = 'northwest';
-else
-   location = 'northeast';
-end
-
-legend('Data Points','Best Fit Line','Upper Func. Bound',...
-   'Lower Func. Bound', 'Upper Obs. Bound', 'Lower Obs. Bound',...
-   'Location', location)
-
-grid on
-hold off
-
-%% Use the data from above to convert our log to depth to plot
-depth_m = beta0 + beta1 .* Vpress_raw;
-
-%% Should we find a way to clean the data? 
-
 %% PLOTY PLOT PLOTSSSSS
 
-
 figure;
-plot(T_C, depth_m, 'o-')
-xlabel('Temperature (°C)')
-ylabel('Depth (m)')
+plot(depth, T_C, 'o')
+xlabel('Depth (m)')
+ylabel('Temperature (°C)')
 title('Temperature vs Depth')
 legend('Legend')
+%subplot(3,1,1)
 grid on
 
 figure;
-plot(light_vis, depth_m, 'o-')
-xlabel('Visible + IR')
-ylabel('Depth (m)')
+plot(depth, light_vis, 'o')
+xlabel('Depth (m)')
+ylabel('Visible + IR')
 title('Light vs Depth')
 legend('Legend')
+%subplot(3,1,2)
 grid on
 
 figure;
-plot(light_ir, depth_m, 'o-')
-xlabel('Infrared')
-ylabel('Depth (m)')
+plot(depth, light_ir, 'o')
+xlabel('Depth (m)')
+ylabel('Infrared')
 title('Infrared vs Depth')
 legend('Legend')
+%subplot(3,1,3)
+grid on
+
+figure
+plot(T_C, 'o')
+xlabel('Sample Number')
+ylabel('Temperature (°C)')
+title('Temperature')
+grid on
+
+figure
+plot(light_vis, 'o')
+xlabel('Sample Number')
+ylabel('Visible + IR')
+title('Light')
+grid on
+
+figure
+plot(depth, 'o')
+xlabel('Sample Number')
+ylabel('Depth (m)')
+title('Depth')
 grid on
