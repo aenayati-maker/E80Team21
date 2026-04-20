@@ -1,9 +1,0 @@
-syms r T J;
-
-x = -r*T/J;
-
-s = [ 0 0 x
-      0 0 0
-      x 0 0];
-
-eig(s)

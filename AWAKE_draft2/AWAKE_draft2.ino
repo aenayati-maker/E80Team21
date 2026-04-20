@@ -22,8 +22,8 @@ E80 Lab 7 Dive Activity Code
 #include <DepthControl.h>
 #define UartSerial Serial1
 #include <GPSLockLED.h>
-#include "Adafruit_LTR329_LTR303.h"
-
+#include <LightSensor.h>
+#include <BurstADCSampler.h>
 /////////////////////////* GLOBAL VARIABLES *////////////////////////
 
 MotorDriver motor_driver;
@@ -39,20 +39,23 @@ SensorIMU imu;
 Logger logger;
 Printer printer;
 GPSLockLED led;
+LightSensor light_sensor;
+BurstADCSampler burst_adc;
 
-// ---------------- LIGHT SENSOR ----------------
-Adafruit_LTR329 ltr;
-bool ltr_enabled = false;
-uint16_t visible_plus_ir = 0;
-uint16_t infrared = 0;
-bool lightValid = false;
+
+////////////////////////* SETUP *////////////////////////////////
 
 // loop timing
 int loopStartTime;
 int currentTime;
 volatile bool EF_States[NUM_FLAGS] = {1,1,1};
 
-////////////////////////* SETUP *////////////////////////////////
+
+//////////////////////// INTERRUPTS ////////////////////////
+
+void EFA_Detected(void){ EF_States[0] = 0; }
+void EFB_Detected(void){ EF_States[1] = 0; }
+void EFC_Detected(void){ EF_States[2] = 0; }
 
 void setup() {
   ltr_enabled = 1;
@@ -68,30 +71,16 @@ void setup() {
   logger.include(&button_sampler);
   logger.init();
 
+  logger.include(&light_sensor);
+  logger.init();
+  burst_adc.init();
+
   printer.init();
   ef.init();
   button_sampler.init();
   imu.init();
 
-  // ---------------- LIGHT SENSOR INIT ----------------
-  printer.printMessage("Searching for LTR-329", 10);
-
-  if (ltr.begin()) {
-
-    ltr_enabled = true;
-
-    printer.printMessage("Found LTR sensor!", 10);
-
-    ltr.setGain(LTR3XX_GAIN_2);
-    ltr.setIntegrationTime(LTR3XX_INTEGTIME_100);
-    ltr.setMeasurementRate(LTR3XX_MEASRATE_200);
-
-  } else {
-
-    ltr_enabled = false;
-
-    printer.printMessage("LTR not found (disabled)", 10);
-  }
+  light_sensor.init();
 
   // ---------------- OTHER SYSTEMS ----------------
   UartSerial.begin(9600);
@@ -99,10 +88,14 @@ void setup() {
   motor_driver.init();
   led.init();
 
+<<<<<<< Updated upstream
   int diveDelay = 3000;
+=======
+  int diveDelay = 5000;
+>>>>>>> Stashed changes
 
-  const int num_depth_waypoints = 2;
-  double depth_waypoints[] = {0.5, 1};
+  const int num_depth_waypoints = 5;
+  double depth_waypoints[] = {0.3, 0.6, 0.9, 1.2, 5};
   depth_control.init(num_depth_waypoints, depth_waypoints, diveDelay);
 
   xy_state_estimator.init();
@@ -120,6 +113,9 @@ void setup() {
   z_state_estimator.lastExecutionTime  = loopStartTime - LOOP_PERIOD + Z_STATE_ESTIMATOR_LOOP_OFFSET;
   depth_control.lastExecutionTime      = loopStartTime - LOOP_PERIOD + DEPTH_CONTROL_LOOP_OFFSET;
   logger.lastExecutionTime             = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
+
+  light_sensor.lastExecutionTime    = loopStartTime - LOOP_PERIOD + 80;
+  burst_adc.lastExecutionTime       = loopStartTime;
 }
 
 //////////////////////////////* LOOP */////////////////////////
@@ -146,6 +142,7 @@ void loop() {
     printer.printValue(9, imu.printRollPitchHeading());
     printer.printValue(10, imu.printAccels());
 
+<<<<<<< Updated upstream
     // LIGHT SENSOR OUTPUT (SAFE)
     if (lightValid) {
       printer.printValue(11, String(visible_plus_ir) + "," + String(infrared));
@@ -154,8 +151,12 @@ void loop() {
       printer.printValue(12, ltr.newDataAvailable());
     }
 
+=======
+    printer.printValue(11,light_sensor.printState());
+>>>>>>> Stashed changes
     printer.printToSerial();
-  }
+
+
 
   ////////////////////// CONTROL //////////////////////
 
@@ -229,6 +230,7 @@ void loop() {
     imu.read();
   }
 
+<<<<<<< Updated upstream
   ////////////////////// LIGHT SENSOR (SAFE) //////////////////////
   if (ltr_enabled && ltr.newDataAvailable()) {
     lightValid = 1;
@@ -237,7 +239,14 @@ void loop() {
 
   } else {
     lightValid = false;
+=======
+  //////////////////// LIGHT SENSOR //////////////////////
+    if ( currentTime-light_sensor.lastExecutionTime > LOOP_PERIOD ) {
+    light_sensor.lastExecutionTime = currentTime;
+    light_sensor.updateState();
+>>>>>>> Stashed changes
   }
+
 
   ////////////////////// GPS //////////////////////
   gps.read(&GPS);
@@ -267,8 +276,5 @@ void loop() {
   }
 }
 
-//////////////////////// INTERRUPTS ////////////////////////
+}
 
-void EFA_Detected(void){ EF_States[0] = 0; }
-void EFB_Detected(void){ EF_States[1] = 0; }
-void EFC_Detected(void){ EF_States[2] = 0; }
