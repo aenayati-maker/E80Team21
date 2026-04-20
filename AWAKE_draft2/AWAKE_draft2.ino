@@ -58,7 +58,6 @@ void EFB_Detected(void){ EF_States[1] = 0; }
 void EFC_Detected(void){ EF_States[2] = 0; }
 
 void setup() {
-  ltr_enabled = 1;
 
   logger.include(&imu);
   logger.include(&gps);
@@ -88,11 +87,7 @@ void setup() {
   motor_driver.init();
   led.init();
 
-<<<<<<< Updated upstream
-  int diveDelay = 3000;
-=======
   int diveDelay = 5000;
->>>>>>> Stashed changes
 
   const int num_depth_waypoints = 5;
   double depth_waypoints[] = {0.3, 0.6, 0.9, 1.2, 5};
@@ -121,7 +116,6 @@ void setup() {
 //////////////////////////////* LOOP */////////////////////////
 
 void loop() {
-  lightValid = 1;
 
   currentTime = millis();
 
@@ -142,26 +136,12 @@ void loop() {
     printer.printValue(9, imu.printRollPitchHeading());
     printer.printValue(10, imu.printAccels());
 
-<<<<<<< Updated upstream
-    // LIGHT SENSOR OUTPUT (SAFE)
-    if (lightValid) {
-      printer.printValue(11, String(visible_plus_ir) + "," + String(infrared));
-    } else {
-      printer.printValue(11, "NO LIGHT DATA");
-      printer.printValue(12, ltr.newDataAvailable());
-    }
-
-=======
     printer.printValue(11,light_sensor.printState());
->>>>>>> Stashed changes
     printer.printToSerial();
 
 
 
   ////////////////////// CONTROL //////////////////////
-
-
-  if (currentTime > 60000) { 
   if (currentTime - depth_control.lastExecutionTime > LOOP_PERIOD) {
     depth_control.lastExecutionTime = currentTime;
 
@@ -188,7 +168,6 @@ void loop() {
 
       motor_driver.drive(depth_control.uV, depth_control.uV, depth_control.uV);
     }
-  }
   }
 
   ////////////////////// ADC //////////////////////
@@ -230,21 +209,10 @@ void loop() {
     imu.read();
   }
 
-<<<<<<< Updated upstream
-  ////////////////////// LIGHT SENSOR (SAFE) //////////////////////
-  if (ltr_enabled && ltr.newDataAvailable()) {
-    lightValid = 1;
-    //lightValid = ltr.readBothChannels(visible_plus_ir, infrared);
-    ltr.readBothChannels(visible_plus_ir, infrared);
-
-  } else {
-    lightValid = false;
-=======
   //////////////////// LIGHT SENSOR //////////////////////
     if ( currentTime-light_sensor.lastExecutionTime > LOOP_PERIOD ) {
     light_sensor.lastExecutionTime = currentTime;
     light_sensor.updateState();
->>>>>>> Stashed changes
   }
 
 
@@ -275,6 +243,5 @@ void loop() {
     logger.log();
   }
 }
-
 }
 
