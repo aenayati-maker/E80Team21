@@ -89,8 +89,8 @@ void setup() {
 
   int diveDelay = 5000;
 
-  const int num_depth_waypoints = 5;
-  double depth_waypoints[] = {0.3, 0.6, 0.9, 1.2, 5};
+  const int num_depth_waypoints = 3;
+  double depth_waypoints[] = {0.6, 0.9, 1}; // meter
   depth_control.init(num_depth_waypoints, depth_waypoints, diveDelay);
 
   xy_state_estimator.init();
@@ -142,6 +142,7 @@ void loop() {
 
 
   ////////////////////// CONTROL //////////////////////
+  if (currentTime > 60000)  {
   if (currentTime - depth_control.lastExecutionTime > LOOP_PERIOD) {
     depth_control.lastExecutionTime = currentTime;
 
@@ -169,7 +170,7 @@ void loop() {
       motor_driver.drive(depth_control.uV, depth_control.uV, depth_control.uV);
     }
   }
-
+  }
   ////////////////////// ADC //////////////////////
   if (currentTime - adc.lastExecutionTime > LOOP_PERIOD) {
     adc.lastExecutionTime = currentTime;
